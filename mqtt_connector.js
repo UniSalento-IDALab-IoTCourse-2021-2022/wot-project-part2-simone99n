@@ -18,23 +18,6 @@ const option_publish = {
     retain: false
 }
 
-var patient = {
-    name : null,
-    surname : null,
-    sex : null,
-    height : null
-};
-var muscle_strenght = null; //grams
-var acceleration = {
-    acceleration_x : null,
-    acceleration_y : null,
-    acceleration_z : null
-}; // m/s^2
-var bia_measure = {
-    FM : null,
-    FFM : null
-}
-
 const client = mqtt.connect(connectUrl, option_connect)
 
 client.on("connect",function(){
