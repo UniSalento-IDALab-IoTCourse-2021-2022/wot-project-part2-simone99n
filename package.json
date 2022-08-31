@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "csv": "^6.2.0",
     "http": "^0.0.1-security",
     "mqtt": "^4.3.7",
     "nodejs": "^0.0.0"
