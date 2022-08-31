@@ -3,7 +3,7 @@ console.log(`\nSarcopenia project - Raspberry MQTT - Node.js v${process.versions
 const mqtt = require('mqtt')
 const host = 'mqtt.eclipseprojects.io'
 const port = '1883'
-const clientId = 'mqtt_unisalento_sarcopenia'
+const clientId = 'mqtt_unisalento_sarcopenia_s'
 const connectUrl = `mqtt://${host}:${port}`
 const topic = 'unisalento/sarcopenia'
 
@@ -23,10 +23,14 @@ client.on("error",function(error){
     console.log("Can't connect"+error);
 });
 
-
-client.on('connect', () => {
-    client.subscribe([topic], () => {
-        console.log(`Subscribe to topic '${topic}'`)
+client.on("connect",function(){
+    client.publish(topic, 'mannaggia la ', { qos: 0, retain: false }, (error) => {
+        if (error) {
+            console.error(error)
+        }
     })
-})
+});
+
+
+
 
