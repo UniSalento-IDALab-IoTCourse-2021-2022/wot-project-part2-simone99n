@@ -20,14 +20,21 @@ var bia_measure = {
     FFM : null
 };
 
-async function biaMeasureGenerator(mean, stddev, timeout){
+function biaMeasureGenerator(mean, stddev, timeout){
     for(let i = 0; i < 10; i++) {
-        const result = await getNormallyDistributedRandomNumber(mean, stddev, timeout);
-        console.log(result)
+        const result = getNormallyDistributedRandomNumber(mean, stddev, timeout)
+            .then(
+                (result) => {
+                    console.log(result)
+                }
+            )
     }
 }
 
-biaMeasureGenerator(1.2 , 0.1, 1000)
+console.log("prima")
+biaMeasureGenerator(50 , 5, 1000)
+console.log("dopo")
+
 
 
 // Here I introduce a method that can be used to generate random numbers drawn from a normal distribution.
@@ -52,9 +59,6 @@ function getNormallyDistributedRandomNumber(mean, stddev, timeout) {
         setTimeout(() => {
             resolve(z0 * stddev + mean);
         }, 1000);
-    });
-
-
-   // return z0 * stddev + mean;
+    }); // return z0 * stddev + mean;
 
 }
