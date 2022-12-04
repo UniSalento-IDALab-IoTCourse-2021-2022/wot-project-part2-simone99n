@@ -5,7 +5,7 @@ const host = 'mqtt.eclipseprojects.io'
 const port = '1883'
 const clientId = 'mqtt_unisalento_sarcopenia_r'
 const connectUrl = `mqtt://${host}:${port}`
-const topic = 'unisalento/sarcopenia'
+const topic = 'unisalento/sarcopenia/data/bia'
 
 const client = mqtt.connect(connectUrl, {
     clientId,

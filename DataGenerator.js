@@ -1,5 +1,6 @@
 console.log(`\nSarcopenia project - Raspberry MQTT - Node.js v${process.versions.node}!`)
 
+const mqtt = require('mqtt')
 const argv = require('minimist')(process.argv.slice(2));
 console.dir(argv); console.log();
 
@@ -19,6 +20,24 @@ let acceleration = {
     acceleration_z : null
 }; // m/s^2
 let muscle_strenght = null; //grams
+const delay = 2000 //ms
+const clientId = 'mqtt_unisalento_sarcopenia_s'
+const connectUrl = `mqtt://mqtt.eclipseprojects.io:1883`
+const topic_bia = 'unisalento/sarcopenia/data/bia'
+const topic_acceleration = 'unisalento/sarcopenia/data/acceleration'
+const topic_musclestrenght = 'unisalento/sarcopenia/data/muscle_strenght'
+const option_connect = {
+    clientId,
+    clean: true,
+    connectTimeout: 4000,
+    username: 'emqx',
+    password: 'public',
+    reconnectPeriod: 1000,
+}
+const option_publish = {
+    qos: 0,
+    retain: false
+}
 
 const sleep = (ms) => {
     const startPoint = new Date().getTime()
@@ -71,43 +90,9 @@ function muscleStrenghtMeasureGenerator(mean_MS, stddev_MS){
     console.log("muscle_strenght = " + muscle_strenght)
     return `{ "muscle_strenght" : ${muscle_strenght} }`
 }
-// ----------------------------------START DATA GENERATION--------------------------------------------------------------
-/*
-console.log("[START] Generating simulated sensors data ...\n")
-delay = 500 //ms
-for (let i = 0; i < 10; i++){
-    sleep(delay)
-    biaMeasureGenerator(20 , 50, 1, 1)
-    gaitSpeedMeasureGenerator(1.2 , 0.1, 0.1, 0.5, 0.05, 0.05)
-    muscleStrenghtMeasureGenerator(10 , 1)
-    console.log("")
-}
-console.log("[END] Generating simulated sensors data ...")
- */
-
-// ----------------------------------END DATA GENERATION----------------------------------------------------------------
 
 // ----------------------------------MQTT DATA SEND---------------------------------------------------------------------
 
-const mqtt = require('mqtt')
-const clientId = 'mqtt_unisalento_sarcopenia_s'
-const connectUrl = `mqtt://mqtt.eclipseprojects.io:1883`
-const topic_bia = 'unisalento/sarcopenia/data/bia'
-const topic_acceleration = 'unisalento/sarcopenia/data/acceleration'
-const topic_musclestrenght = 'unisalento/sarcopenia/data/musclestrenght'
-
-const option_connect = {
-    clientId,
-    clean: true,
-    connectTimeout: 4000,
-    username: 'emqx',
-    password: 'public',
-    reconnectPeriod: 1000,
-}
-const option_publish = {
-    qos: 0,
-    retain: false
-}
 
 const client = mqtt.connect(connectUrl, option_connect)
 
@@ -124,7 +109,7 @@ setInterval(function () {
                 console.error(error)
             }
         })
-    },2000
+    }, delay
 );
 
 setInterval(function () {
@@ -133,7 +118,7 @@ setInterval(function () {
                 console.error(error)
             }
         })
-    },2000
+    }, delay
 );
 
 setInterval(function () {
@@ -142,5 +127,5 @@ setInterval(function () {
                 console.error(error)
             }
         })
-    },2000
+    }, delay
 );
