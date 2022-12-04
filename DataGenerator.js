@@ -1,26 +1,27 @@
 // const fs = require("fs");
 // const { parse } = require("csv-parse");
 
-var patient = {
+const argv = require('minimist')(process.argv.slice(2));
+console.dir(argv);
+
+let patient = {
     name : null,
     surname : null,
     sex : null,
     height : null
 };
-var bia_measure = {
+let bia_measure = {
     FM : null,
     FFM : null
 };
 
-var acceleration = {
+let acceleration = {
     acceleration_x : null,
     acceleration_y : null,
     acceleration_z : null
 }; // m/s^2
 
-var muscle_strenght = null; //grams
-
-
+let muscle_strenght = null; //grams
 
 
 const sleep = (ms) => {
@@ -28,8 +29,10 @@ const sleep = (ms) => {
     while (new Date().getTime() - startPoint <= ms) {/* wait */}
 }
 
-// Here I introduce a method that can be used to generate random numbers drawn from a normal distribution.
-// The code below uses the Box-Muller transform to make sure the numbers are normally distributed.
+/*
+Here I introduce a method that can be used to generate random numbers drawn from a normal distribution.
+The code below uses the Box-Muller transform to make sure the numbers are normally distributed.
+ */
 
 // metodo per generare coppie di numeri casuali indipendenti e distribuiti gaussianamente con media nulla e varianza uno
 function boxMullerTransform() {
@@ -45,6 +48,8 @@ function getNormallyDistributedRandomNumber(mean, stddev) {
     const { z0, _ } = boxMullerTransform();
     return z0 * stddev + mean
 }
+
+//the following functions generate sensors data (bia/gaitSpeed/muscleStrenght)
 
 function biaMeasureGenerator(meanFM, meanFFM, stddevFM, stddevFFM) {
     bia_measure.FM = getNormallyDistributedRandomNumber(meanFM, stddevFM)
