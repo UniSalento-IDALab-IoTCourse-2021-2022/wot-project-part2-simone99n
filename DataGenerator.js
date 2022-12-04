@@ -1,8 +1,7 @@
-// const fs = require("fs");
-// const { parse } = require("csv-parse");
+console.log(`\nSarcopenia project - Raspberry MQTT - Node.js v${process.versions.node}!`)
 
 const argv = require('minimist')(process.argv.slice(2));
-console.dir(argv);
+console.dir(argv); console.log();
 
 let patient = {
     name : null,
@@ -10,19 +9,16 @@ let patient = {
     sex : null,
     height : null
 };
-let bia_measure = {
+let bia = {
     FM : null,
     FFM : null
 };
-
 let acceleration = {
     acceleration_x : null,
     acceleration_y : null,
     acceleration_z : null
 }; // m/s^2
-
 let muscle_strenght = null; //grams
-
 
 const sleep = (ms) => {
     const startPoint = new Date().getTime()
@@ -32,8 +28,7 @@ const sleep = (ms) => {
 /*
 Here I introduce a method that can be used to generate random numbers drawn from a normal distribution.
 The code below uses the Box-Muller transform to make sure the numbers are normally distributed.
- */
-
+*/
 // metodo per generare coppie di numeri casuali indipendenti e distribuiti gaussianamente con media nulla e varianza uno
 function boxMullerTransform() {
     const u1 = Math.random();
@@ -49,13 +44,14 @@ function getNormallyDistributedRandomNumber(mean, stddev) {
     return z0 * stddev + mean
 }
 
-//the following functions generate sensors data (bia/gaitSpeed/muscleStrenght)
+/* the following functions generate sensors data (bia/gaitSpeed/muscleStrenght) */
 
 function biaMeasureGenerator(meanFM, meanFFM, stddevFM, stddevFFM) {
-    bia_measure.FM = getNormallyDistributedRandomNumber(meanFM, stddevFM)
-    bia_measure.FFM = getNormallyDistributedRandomNumber(meanFFM, stddevFFM)
-    console.log("FM = " + bia_measure.FM)
-    console.log("FFM = " + bia_measure.FFM)
+    bia.FM = getNormallyDistributedRandomNumber(meanFM, stddevFM)
+    bia.FFM = getNormallyDistributedRandomNumber(meanFFM, stddevFFM)
+    console.log("FM = " + bia.FM)
+    console.log("FFM = " + bia.FFM)
+    return `{ "bia_FM" : ${bia.FM}, "bia_FFM" : ${bia.FFM} }`
 }
 
 function gaitSpeedMeasureGenerator(mean_X, mean_Y, mean_Z, stddev_X, stddev_Y, stddev_Z) {
@@ -65,14 +61,19 @@ function gaitSpeedMeasureGenerator(mean_X, mean_Y, mean_Z, stddev_X, stddev_Y, s
     console.log("acc_x = " + acceleration.acceleration_x)
     console.log("acc_y = " + acceleration.acceleration_y)
     console.log("acc_z = " + acceleration.acceleration_z)
+    return `{ "acc_x" : ${acceleration.acceleration_x}, 
+    "acc_y" : ${acceleration.acceleration_y},
+    "acc_z" : ${acceleration.acceleration_z} }`
 }
 
 function muscleStrenghtMeasureGenerator(mean_MS, stddev_MS){
     muscle_strenght = getNormallyDistributedRandomNumber(mean_MS, stddev_MS)
     console.log("muscle_strenght = " + muscle_strenght)
+    return `{ "muscle_strenght" : ${muscle_strenght} }`
 }
-
-console.log("---INIZIO---")
+// ----------------------------------START DATA GENERATION--------------------------------------------------------------
+/*
+console.log("[START] Generating simulated sensors data ...\n")
 delay = 500 //ms
 for (let i = 0; i < 10; i++){
     sleep(delay)
@@ -81,4 +82,65 @@ for (let i = 0; i < 10; i++){
     muscleStrenghtMeasureGenerator(10 , 1)
     console.log("")
 }
-console.log("---FINE---")
+console.log("[END] Generating simulated sensors data ...")
+ */
+
+// ----------------------------------END DATA GENERATION----------------------------------------------------------------
+
+// ----------------------------------MQTT DATA SEND---------------------------------------------------------------------
+
+const mqtt = require('mqtt')
+const clientId = 'mqtt_unisalento_sarcopenia_s'
+const connectUrl = `mqtt://mqtt.eclipseprojects.io:1883`
+const topic_bia = 'unisalento/sarcopenia/data/bia'
+const topic_acceleration = 'unisalento/sarcopenia/data/acceleration'
+const topic_musclestrenght = 'unisalento/sarcopenia/data/musclestrenght'
+
+const option_connect = {
+    clientId,
+    clean: true,
+    connectTimeout: 4000,
+    username: 'emqx',
+    password: 'public',
+    reconnectPeriod: 1000,
+}
+const option_publish = {
+    qos: 0,
+    retain: false
+}
+
+const client = mqtt.connect(connectUrl, option_connect)
+
+client.on("connect",function(){
+    console.log("Connected");
+});
+client.on("error",function(error){
+    console.log("Can't connect" + error);
+});
+
+setInterval(function () {
+        client.publish(topic_bia, biaMeasureGenerator(20,50,1, 1) , option_publish, (error) => {
+            if (error) {
+                console.error(error)
+            }
+        })
+    },2000
+);
+
+setInterval(function () {
+        client.publish(topic_acceleration, gaitSpeedMeasureGenerator(1.2 , 0.1, 0.1, 0.5, 0.05, 0.05), option_publish, (error) => {
+            if (error) {
+                console.error(error)
+            }
+        })
+    },2000
+);
+
+setInterval(function () {
+        client.publish(topic_musclestrenght, muscleStrenghtMeasureGenerator(10 , 1) , option_publish, (error) => {
+            if (error) {
+                console.error(error)
+            }
+        })
+    },2000
+);
