@@ -83,7 +83,7 @@ function biaMeasureGenerator(meanFM, meanFFM, stddevFM, stddevFFM,
 
     return `{ "bia": { "bia_FM" : ${FM}, "bia_FFM" : ${FFM} },
     "acc": { "acc_x" : ${acceleration_x}, "acc_y" : ${acceleration_y}, "acc_z" : ${acceleration_z} },
-    "muscle_strenght" : ${muscle_strenght} }}`
+    "muscle_strenght" : ${muscle_strenght} }`
 }
 
 // ----------------------------------MQTT DATA SEND---------------------------------------------------------------------
