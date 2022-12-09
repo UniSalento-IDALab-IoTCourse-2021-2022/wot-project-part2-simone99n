@@ -17,6 +17,7 @@ if (argv[2] === '--anomaly' || argv[3] === '--anomaly' )
 console.log("patient = " + patient)
 console.log("anomaly = " + anomaly + "\n")
 //TODO implement 3 different patient
+//TODO implement 5 different kind of measurement sessions with anomalies (plot the results all together)
 //TODO implement anomalies
 
 const delay = 2000 //ms
@@ -66,30 +67,23 @@ function getNormallyDistributedRandomNumber(mean, stddev) {
 
 /* the following functions generate sensors data (bia/gaitSpeed/muscleStrenght) */
 
-function biaMeasureGenerator(meanFM, meanFFM, stddevFM, stddevFFM) {
-    let FM = getNormallyDistributedRandomNumber(meanFM, stddevFM)
-    let FFM = getNormallyDistributedRandomNumber(meanFFM, stddevFFM)
-    console.log("FM = " + FM)
-    console.log("FFM = " + FFM)
-    return `{ "bia_FM" : ${FM}, "bia_FFM" : ${FFM} }`
-}
+function biaMeasureGenerator(meanFM, meanFFM, stddevFM, stddevFFM,
+                             mean_X, mean_Y, mean_Z, stddev_X, stddev_Y, stddev_Z,
+                             mean_MS, stddev_MS) {
 
-function gaitSpeedMeasureGenerator(mean_X, mean_Y, mean_Z, stddev_X, stddev_Y, stddev_Z) {
-    let acceleration_x = getNormallyDistributedRandomNumber(mean_X, stddev_X)
-    let acceleration_y = getNormallyDistributedRandomNumber(mean_Y, stddev_Y)
-    let acceleration_z = getNormallyDistributedRandomNumber(mean_Z, stddev_Z)
-    console.log("acc_x = " + acceleration_x)
-    console.log("acc_y = " + acceleration_y)
-    console.log("acc_z = " + acceleration_z)
-    return `{ "acc_x" : ${acceleration_x}, 
-    "acc_y" : ${acceleration_y},
-    "acc_z" : ${acceleration_z} }`
-}
-
-function muscleStrenghtMeasureGenerator(mean_MS, stddev_MS) {
-    let muscle_strenght = getNormallyDistributedRandomNumber(mean_MS, stddev_MS)
+    let FM = getNormallyDistributedRandomNumber(meanFM, stddevFM).toFixed(2)
+    let FFM = getNormallyDistributedRandomNumber(meanFFM, stddevFFM).toFixed(2)
+    console.log("FM = " + FM + "   FFM = " + FFM)
+    let acceleration_x = getNormallyDistributedRandomNumber(mean_X, stddev_X).toFixed(2)
+    let acceleration_y = getNormallyDistributedRandomNumber(mean_Y, stddev_Y).toFixed(2)
+    let acceleration_z = getNormallyDistributedRandomNumber(mean_Z, stddev_Z).toFixed(2)
+    console.log("acc_x = " + acceleration_x + "   acc_y = " + acceleration_y + "   acc_z = " + acceleration_z)
+    let muscle_strenght = getNormallyDistributedRandomNumber(mean_MS, stddev_MS).toFixed(2)
     console.log("muscle_strenght = " + muscle_strenght + "\n")
-    return `{ "muscle_strenght" : ${muscle_strenght} }`
+
+    return `{ "bia": { "bia_FM" : ${FM}, "bia_FFM" : ${FFM} },
+    "acc": { "acc_x" : ${acceleration_x}, "acc_y" : ${acceleration_y}, "acc_z" : ${acceleration_z} },
+    "muscle_strenght" : ${muscle_strenght} }}`
 }
 
 // ----------------------------------MQTT DATA SEND---------------------------------------------------------------------
@@ -103,28 +97,41 @@ client.on("error", function (error) {
 });
 
 setInterval(function () {
-        client.publish(topic_bia, biaMeasureGenerator(20, 50, 1, 1), option_publish, (error) => {
+        client.publish(topic_bia, biaMeasureGenerator(20, 50, 1, 1,
+            1.2, 0.1, 0.1, 0.5, 0.05, 0.05,
+            10, 1),
+            option_publish, (error) => {
             if (error) {
                 console.error(error)
             }
         })
+
     }, delay
 );
 
-setInterval(function () {
+
+/*
         client.publish(topic_acceleration, gaitSpeedMeasureGenerator(1.2, 0.1, 0.1, 0.5, 0.05, 0.05), option_publish, (error) => {
             if (error) {
                 console.error(error)
             }
         })
-    }, delay
-);
-
-setInterval(function () {
         client.publish(topic_musclestrenght, muscleStrenghtMeasureGenerator(10, 1), option_publish, (error) => {
             if (error) {
                 console.error(error)
             }
         })
-    }, delay
-);
+ */
+
+
+
+
+/*
+function gaitSpeedMeasureGenerator(mean_X, mean_Y, mean_Z, stddev_X, stddev_Y, stddev_Z) {
+
+}
+
+function muscleStrenghtMeasureGenerator(mean_MS, stddev_MS) {
+
+}
+ */
