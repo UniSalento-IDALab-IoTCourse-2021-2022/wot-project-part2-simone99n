@@ -23,9 +23,8 @@ console.log("anomaly = " + anomaly + "\n")
 const delay = 2000 //ms
 const clientId = 'mqtt_unisalento_sarcopenia_s'
 const connectUrl = `mqtt://mqtt.eclipseprojects.io:1883`
-const topic_bia = 'unisalento/sarcopenia/data/bia'
-const topic_acceleration = 'unisalento/sarcopenia/data/acceleration'
-const topic_musclestrenght = 'unisalento/sarcopenia/data/muscle_strenght'
+const topic = 'unisalento/sarcopenia/sensorData'
+
 const option_connect = {
     clientId,
     clean: true,
@@ -67,7 +66,7 @@ function getNormallyDistributedRandomNumber(mean, stddev) {
 
 /* the following functions generate sensors data (bia/gaitSpeed/muscleStrenght) */
 
-function biaMeasureGenerator(meanFM, meanFFM, stddevFM, stddevFFM,
+function measureGenerator(meanFM, meanFFM, stddevFM, stddevFFM,
                              mean_X, mean_Y, mean_Z, stddev_X, stddev_Y, stddev_Z,
                              mean_MS, stddev_MS) {
 
@@ -97,7 +96,7 @@ client.on("error", function (error) {
 });
 
 setInterval(function () {
-        client.publish(topic_bia, biaMeasureGenerator(20, 50, 1, 1,
+        client.publish(topic, measureGenerator(20, 50, 1, 1,
             1.2, 0.1, 0.1, 0.5, 0.05, 0.05,
             10, 1),
             option_publish, (error) => {
@@ -109,29 +108,3 @@ setInterval(function () {
     }, delay
 );
 
-
-/*
-        client.publish(topic_acceleration, gaitSpeedMeasureGenerator(1.2, 0.1, 0.1, 0.5, 0.05, 0.05), option_publish, (error) => {
-            if (error) {
-                console.error(error)
-            }
-        })
-        client.publish(topic_musclestrenght, muscleStrenghtMeasureGenerator(10, 1), option_publish, (error) => {
-            if (error) {
-                console.error(error)
-            }
-        })
- */
-
-
-
-
-/*
-function gaitSpeedMeasureGenerator(mean_X, mean_Y, mean_Z, stddev_X, stddev_Y, stddev_Z) {
-
-}
-
-function muscleStrenghtMeasureGenerator(mean_MS, stddev_MS) {
-
-}
- */
