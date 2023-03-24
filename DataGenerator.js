@@ -1,24 +1,27 @@
 console.log(`\nSARCOPENIA PROJECT - Raspberry MQTT - Norberti Simone - Node.js v${process.versions.node}!\n`)
 
 const mqtt = require('mqtt')
+const fs = require("fs");
+const { parse } = require("csv-parse");
 
 const argv = process.argv
 let patient = 1 //default patient 1
-let anomaly = false //default no anomaly
+let anomaly = 0 //default no anomaly
 
 if (argv[2] === '--patient1' || argv[3] === '--patient1' )
     patient = 1
 if (argv[2] === '--patient2' || argv[3] === '--patient2' )
-    patient = 2
-if (argv[2] === '--patient3' || argv[3] === '--patient3' )
-    patient = 3
-if (argv[2] === '--anomaly' || argv[3] === '--anomaly' )
-    anomaly = true
+    patient = 8
+if (argv[2] === '--anomaly1' || argv[3] === '--anomaly1' )
+    anomaly = 1
+if (argv[2] === '--anomaly2' || argv[3] === '--anomaly2' )
+    anomaly = 2
+if (argv[2] === '--anomaly3' || argv[3] === '--anomaly3' )
+    anomaly = 3
+
 console.log("patient = " + patient)
 console.log("anomaly = " + anomaly + "\n")
-//TODO implement 3 different patient
-//TODO implement 5 different kind of measurement sessions with anomalies (plot the results all together)
-//TODO implement anomalies
+
 
 const delay = 2000 //ms
 const clientId = 'mqtt_unisalento_sarcopenia_s'
@@ -44,12 +47,13 @@ const sleep = (ms) => {
     }
 }
 
-/*
-Here I introduce a method that can be used to generate random numbers drawn from a normal distribution.
-The code below uses the Box-Muller transform to make sure the numbers are normally distributed.
-*/
 
-// metodo per generare coppie di numeri casuali indipendenti e distribuiti gaussianamente con media nulla e varianza uno
+let data = fs.readFileSync("./data.csv", "utf8");
+data = data.split("\n")
+for (let i = 0; i<data.length; i++) { data[i] = data[i].split(",") } // split data in 3D array
+
+
+// genera coppie di numeri casuali indipendenti e distribuiti gaussianamente con media nulla e varianza unitaria
 function boxMullerTransform() {
     const u1 = Math.random();
     const u2 = Math.random();
@@ -64,28 +68,57 @@ function getNormallyDistributedRandomNumber(mean, stddev) {
     return z0 * stddev + mean
 }
 
-/* the following functions generate sensors data (bia/gaitSpeed/muscleStrenght) */
+// ID, Sex ,Sarcopenia, Age,BMI, Risk & Malnutrition, Gait_Speed, Grip_Strength, Muscle mass
+function measureGenerator(data_raw, anomaly) {
+    const id = parseFloat(data_raw[0])
+    const sex = parseFloat(data_raw[1])
+    const sarcopenia = parseFloat(data_raw[2])
+    const age = parseFloat(data_raw[3])
+    const bmi = parseFloat(data_raw[4])
+    const risk_malnutrition = parseFloat(data_raw[5])
+    const gait_speed = parseFloat(data_raw[6])
+    const grip_strength = parseFloat(data_raw[7])
+    const muscle_mass = parseFloat(data_raw[8])
+    let gait_speed_tosend = 0
+    let grip_strength_tosend = 0
+    let muscle_mass_tosend = 0
 
-function measureGenerator(meanFM, meanFFM, stddevFM, stddevFFM,
-                             mean_X, mean_Y, mean_Z, stddev_X, stddev_Y, stddev_Z,
-                             mean_MS, stddev_MS) {
+    if (anomaly===0){
+        gait_speed_tosend = getNormallyDistributedRandomNumber(gait_speed, 0.01).toFixed(4)
+        grip_strength_tosend = getNormallyDistributedRandomNumber(grip_strength, 0.01).toFixed(4)
+        muscle_mass_tosend = getNormallyDistributedRandomNumber(muscle_mass, 0.01).toFixed(4)
+    }
 
-    let FM = getNormallyDistributedRandomNumber(meanFM, stddevFM).toFixed(2)
-    let FFM = getNormallyDistributedRandomNumber(meanFFM, stddevFFM).toFixed(2)
-    console.log("FM = " + FM + "   FFM = " + FFM)
-    let acceleration_x = getNormallyDistributedRandomNumber(mean_X, stddev_X).toFixed(2)
-    let acceleration_y = getNormallyDistributedRandomNumber(mean_Y, stddev_Y).toFixed(2)
-    let acceleration_z = getNormallyDistributedRandomNumber(mean_Z, stddev_Z).toFixed(2)
-    console.log("acc_x = " + acceleration_x + "   acc_y = " + acceleration_y + "   acc_z = " + acceleration_z)
-    let muscle_strenght = getNormallyDistributedRandomNumber(mean_MS, stddev_MS).toFixed(2)
-    console.log("muscle_strenght = " + muscle_strenght + "\n")
+    if (anomaly===1){
+        gait_speed_tosend = getNormallyDistributedRandomNumber(gait_speed - gait_speed/20, 0.01).toFixed(4)
+        grip_strength_tosend = getNormallyDistributedRandomNumber(grip_strength - grip_strength/10, 0.01).toFixed(4)
+        muscle_mass_tosend = getNormallyDistributedRandomNumber(muscle_mass - muscle_mass/20, 0.01).toFixed(4)
+    }
+    else if (anomaly===2){
+        gait_speed_tosend = getNormallyDistributedRandomNumber(gait_speed - gait_speed/10, 0.01).toFixed(4)
+        grip_strength_tosend = getNormallyDistributedRandomNumber(grip_strength - grip_strength/5, 0.01).toFixed(4)
+        muscle_mass_tosend = getNormallyDistributedRandomNumber(muscle_mass - muscle_mass/20, 0.01).toFixed(4)
+    }
+    else if (anomaly===3){
+        gait_speed_tosend = getNormallyDistributedRandomNumber(gait_speed - gait_speed/5, 0.01).toFixed(4)
+        grip_strength_tosend = getNormallyDistributedRandomNumber(grip_strength - grip_strength/5, 0.01).toFixed(4)
+        muscle_mass_tosend = getNormallyDistributedRandomNumber(muscle_mass - muscle_mass/5, 0.01).toFixed(4)
+    }
+    else{
+        console.log("[ERROR] - anomaly parameter has not valid number")
+    }
 
-    return `{ "bia": { "bia_FM" : ${FM}, "bia_FFM" : ${FFM} },
-    "acc": { "acc_x" : ${acceleration_x}, "acc_y" : ${acceleration_y}, "acc_z" : ${acceleration_z} },
-    "muscle_strenght" : ${muscle_strenght} }`
+
+    console.log("\ngait_speed = " + gait_speed_tosend)
+    console.log("grip_strength = " + grip_strength_tosend)
+    console.log("muscle_mass = " + muscle_mass_tosend)
+
+
+    return `{ "GAIT_SPEED": ${gait_speed_tosend}, "GRIP_STRENGHT": ${grip_strength_tosend}, "MUSCLE_MASS" : ${muscle_mass_tosend} , "TIMESTAMP": ${Date.now()} }`
 }
 
 // ----------------------------------MQTT DATA SEND---------------------------------------------------------------------
+
 const client = mqtt.connect(connectUrl, option_connect)
 
 client.on("connect", function () {
@@ -95,15 +128,15 @@ client.on("error", function (error) {
     console.log("Can't connect" + error);
 });
 
+
+
 setInterval(function () {
-        client.publish(topic, measureGenerator(20, 50, 1, 1,
-            1.2, 0.1, 0.1, 0.5, 0.05, 0.05,
-            10, 1),
+        client.publish(topic, measureGenerator(data[patient], anomaly),
             option_publish, (error) => {
-            if (error) {
-                console.error(error)
-            }
-        })
+                if (error) {
+                    console.error(error)
+                }
+            })
 
     }, delay
 );
