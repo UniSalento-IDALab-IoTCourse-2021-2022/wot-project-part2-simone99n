@@ -6,7 +6,7 @@ const { parse } = require("csv-parse");
 
 const argv = process.argv
 let patient = 1 //default patient 1
-let anomaly = 0 //default no anomaly
+let anomaly = 0 //default no anomaly 0
 
 if (argv[2] === '--patient1' || argv[3] === '--patient1' )
     patient = 1
@@ -88,16 +88,15 @@ function measureGenerator(data_raw, anomaly) {
         grip_strength_tosend = getNormallyDistributedRandomNumber(grip_strength, 0.01).toFixed(4)
         muscle_mass_tosend = getNormallyDistributedRandomNumber(muscle_mass, 0.01).toFixed(4)
     }
-
-    if (anomaly===1){
+    else if (anomaly===1){
         gait_speed_tosend = getNormallyDistributedRandomNumber(gait_speed - gait_speed/20, 0.01).toFixed(4)
-        grip_strength_tosend = getNormallyDistributedRandomNumber(grip_strength - grip_strength/10, 0.01).toFixed(4)
+        grip_strength_tosend = getNormallyDistributedRandomNumber(grip_strength - grip_strength/20, 0.01).toFixed(4)
         muscle_mass_tosend = getNormallyDistributedRandomNumber(muscle_mass - muscle_mass/20, 0.01).toFixed(4)
     }
     else if (anomaly===2){
         gait_speed_tosend = getNormallyDistributedRandomNumber(gait_speed - gait_speed/10, 0.01).toFixed(4)
-        grip_strength_tosend = getNormallyDistributedRandomNumber(grip_strength - grip_strength/5, 0.01).toFixed(4)
-        muscle_mass_tosend = getNormallyDistributedRandomNumber(muscle_mass - muscle_mass/20, 0.01).toFixed(4)
+        grip_strength_tosend = getNormallyDistributedRandomNumber(grip_strength - grip_strength/10, 0.01).toFixed(4)
+        muscle_mass_tosend = getNormallyDistributedRandomNumber(muscle_mass - muscle_mass/10, 0.01).toFixed(4)
     }
     else if (anomaly===3){
         gait_speed_tosend = getNormallyDistributedRandomNumber(gait_speed - gait_speed/5, 0.01).toFixed(4)
@@ -105,7 +104,7 @@ function measureGenerator(data_raw, anomaly) {
         muscle_mass_tosend = getNormallyDistributedRandomNumber(muscle_mass - muscle_mass/5, 0.01).toFixed(4)
     }
     else{
-        console.log("[ERROR] - anomaly parameter has not valid number")
+        console.log("[ERROR] - anomaly parameter has not valid number:" + anomaly)
     }
 
 
