@@ -32,6 +32,7 @@ git clone https://github.com/UniSalento-IDALab-IoTCourse-2021-2022/wot-project-r
 ```
 Per avviare il simulatore di sensori:
 ```
+cd wot-project-raspberry-SimoneNorberti/
 node DataGenerator.js 
 ```
 Disponibili più opzioni(due possibili pazienti simulati, 3 livelli di anomalia). Se nessuna opzione è specificata, viene selezionato il paziente 1 con nessun livello di anomalia:
