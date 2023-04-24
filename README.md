@@ -3,6 +3,10 @@
 Installare RaspbianOS sul Raspberry:
 https://www.raspberrypi.com/documentation/computers/getting-started.html
 
+Per effettuare la connessione SSH al Raspberry lanciare il seguente comando e inserire la password (default ```raspberry```):
+```
+ssh pi@192.168.1.161
+```
 Installare NodeJS:
 ```
 sudo apt update
@@ -20,7 +24,3 @@ cd SarcopeniaRasp
 git clone https://github.com/UniSalento-IDALab-IoTCourse-2021-2022/wot-project-raspberry-SimoneNorberti/  
 ```
 
-Per effettuare la connessione SSH al Raspberry lanciare il seguente comando e inserire la password (default ```raspberry```):
-```
-ssh pi@192.168.1.161
-```
