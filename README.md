@@ -11,11 +11,14 @@ Attenzione: verificare l'indirizzo IP del Raspberry nella propria rete locale!
 ```
 ssh pi@192.168.1.161
 ```
-Installare NodeJS:
+Installare NodeJS e i pacchetti utilizzati:
 ```
 sudo apt update
 sudo apt upgrade
 sudo apt install nodejs
+npm install mqtt
+npm install fs
+npm install csv-parse
 ```
 Installare git:
 ```
