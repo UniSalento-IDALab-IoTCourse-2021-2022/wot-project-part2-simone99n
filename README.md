@@ -12,15 +12,15 @@ Front-End (Cloud): https://github.com/UniSalento-IDALab-IoTCourse-2021-2022/wot-
 
 
 ## Simulatore di sensori su Raspberry Pi
+
+Installare RaspbianOS sul Raspberry:
+https://www.raspberrypi.com/documentation/computers/getting-started.html
+
 Per effettuare la connessione SSH al Raspberry lanciare il seguente comando e inserire la password (default ```raspberry```):
 Attenzione: verificare l'indirizzo IP del Raspberry nella propria rete locale!
 ```
 ssh pi@192.168.1.161
 ```
-
-## Guida all'installazione
-Installare RaspbianOS sul Raspberry:
-https://www.raspberrypi.com/documentation/computers/getting-started.html
 
 Installare NodeJS e i pacchetti utilizzati:
 ```
