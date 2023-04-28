@@ -90,8 +90,8 @@ function measureGenerator(data_raw, anomaly) {
     }
     else if (anomaly===1){
         gait_speed_tosend = getNormallyDistributedRandomNumber(gait_speed - gait_speed/20, 0.01).toFixed(4)
-        grip_strength_tosend = getNormallyDistributedRandomNumber(grip_strength - grip_strength/20, 0.01).toFixed(4)
-        muscle_mass_tosend = getNormallyDistributedRandomNumber(muscle_mass - muscle_mass/20, 0.01).toFixed(4)
+        grip_strength_tosend = getNormallyDistributedRandomNumber(grip_strength - grip_strength/40, 0.01).toFixed(4)
+        muscle_mass_tosend = getNormallyDistributedRandomNumber(muscle_mass - muscle_mass/40, 0.01).toFixed(4)
     }
     else if (anomaly===2){
         gait_speed_tosend = getNormallyDistributedRandomNumber(gait_speed - gait_speed/10, 0.01).toFixed(4)
